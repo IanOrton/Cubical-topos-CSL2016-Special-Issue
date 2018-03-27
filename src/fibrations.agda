@@ -46,8 +46,8 @@ reindex' (A , α) ρ = (A ∘ ρ , reindex A α ρ)
 ----------------------------------------------------------------------
 -- Reindexing is functorial
 ----------------------------------------------------------------------
-reindexId : {Γ : Set}{A : Γ → Set}{α : isFib A} → α ≡ reindex A α id 
-reindexId = refl
+reindexAlongId : {Γ : Set}{A : Γ → Set}{α : isFib A} → α ≡ reindex A α id 
+reindexAlongId = refl
 
 reindexComp :
   {Γ₁ Γ₂ Γ₃ : Set}{A : Γ₃ → Set}{α : isFib A}
@@ -56,8 +56,8 @@ reindexComp :
   reindex A α (g ∘ f) ≡ reindex (A ∘ g) (reindex A α g) f
 reindexComp g f = refl
 
-reindexId' : {Γ : Set}{A : Fib Γ} → reindex' A id ≡ A
-reindexId' = refl
+reindexAlongId' : {Γ : Set}{A : Fib Γ} → reindex' A id ≡ A
+reindexAlongId' = refl
 
 abstract
  reindexComp' :

@@ -64,15 +64,15 @@ existsCof φ f fCof = subst (prf ∘ cof) eqProps' cofφ&exists where
   cofφ&exists = cof& (fst φ) (exists [ φ ] f) (snd φ) imp
   
 
-FibId : {Γ : Set}{A : Γ → Set} → isFib A → isFib (Id A)
-FibId {Γ} {A} α = FibΣ {B = Prf} (FibPath {A = A} α) β where
+FibId' : {A : Int → Set} → isFib A → isFib (Id A)
+FibId' {A} α = FibΣ {B = Prf} (FibPath {A = A} α) β where
   Γ' : Set
-  Γ' = Σ (Σ Γ (λ x → A x × A x)) (Path A)
+  Γ' = Σ (Σ Int (λ x → A x × A x)) (Path A)
   
   Prf : Γ' → Set
   Prf ((x , (a , a')) , p) = ⟦ φ ∈ Cof ∣ fst φ ⊃ (All i ∈ Int , fst p i ≈ a) ⟧
   
-  prfExt : {x : Γ}{a a' : A x}{p : a ~ a'}{pr pr' : Prf ((x , (a , a')) , p)} → fst (fst pr) ≡ fst (fst pr') → pr ≡ pr'
+  prfExt : {x : Int}{a a' : A x}{p : a ~ a'}{pr pr' : Prf ((x , (a , a')) , p)} → fst (fst pr) ≡ fst (fst pr') → pr ≡ pr'
   prfExt {x} {a} {a'} {p} {((φ , _) , _)} {_} refl = Σext (Σext refl (eq (cof φ))) (eq (φ ⊃ (All i ∈ Int , fst p i ≈ a)))
   
   β : isFib Prf
@@ -90,7 +90,27 @@ FibId {Γ} {A} α = FibΣ {B = Prf} (FibPath {A = A} α) β where
       backwards : prf (fst (fst (fst ψ))) → prf (fst (fst (f u ⟨ ! e ⟩)))
       backwards v = ∥∥-rec (fst (fst (f u ⟨ ! e ⟩))) (λ pair → subst (λ v → [ fst (f v ⟨ ! e ⟩) ]) (eq (fst φ )) (snd pair)) v
 
+FibId : {Γ : Set}{A : Γ → Set} → isFib A → isFib (Id A)
+FibId {Γ} {A} α e p = FibId' (reindex A α (fst ∘ p)) e (id× p) where
+  id×_ : (p : Int → Σ Γ (λ x → A x × A x)) → Int → Σ Int (λ i → A (fst (p i)) × A (fst (p i)))
+  (id× p) i = (i , snd (p i))
 
+----------------------------------------------------------------------
+-- Forming Id types is stable under reindexing
+----------------------------------------------------------------------
+reindexId :
+  {Δ Γ : Set}
+  (A : Γ → Set)
+  (α : isFib A)
+  (ρ : Δ → Γ)
+  → ----------------------
+  reindex (Id A) (FibId α) (ρ ×id) ≡ FibId (reindex A α ρ)
+reindexId A α ρ = refl
+
+
+----------------------------------------------------------------------
+-- Refl and J-eliminator
+----------------------------------------------------------------------
 reflId : {Γ : Set}(A : Γ → Set){x : Γ}(a : A x) → Id A (x , (a , a))
 reflId {Γ} A {x} a = (reflPath {A = A} a , (cofTrue , (λ tt i → refl)))
 
